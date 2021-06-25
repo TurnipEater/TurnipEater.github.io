@@ -1,0 +1,134 @@
+<html lang="en-gb" dir="ltr">
+
+<head>
+<title>Sortable list demo</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- The sortable list is taken from https://getuikit.com/docs/sortable
+and links to their CSS and JS. https://getuikit.com/docs/installation --> 
+     
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.22/dist/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.6.22/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.6.22/dist/js/uikit-icons.min.js"></script>
+
+
+
+<style>
+div {width: 90%;
+  margin: auto;
+}
+</style>
+
+<body>
+    
+<div> Sort the following items into the correct order.<P><P/> </div>
+<!-- Here are the items in the list. They are written here unsorted
+but the two id numbers define the correct order --> 
+  
+<div>       
+<ul id="sortable-element" uk-sortable>
+    <li class="uk-sortable-item" data-id="2" id="2">Content B</li>
+    <li class="uk-sortable-item" data-id="1" id="1">Content A</li>
+    <li class="uk-sortable-item" data-id="3" id="3">Content C</li>
+    <li class="uk-sortable-item" data-id="5" id="5">Content E</li>
+    <li class="uk-sortable-item" data-id="4" id="4">Content D</li>
+</ul>
+</div>    
+
+<!-- This div is used to display the checked answer --> 
+  
+<div id= update>
+<P> You need to attempt the task before checking the answer </P>
+</div>
+       
+       <script>
+       
+       //Initialise some variables
+       var OutputStr1 ="";
+       var OutputStr2 ="";
+       var PrevIndxNo = "0";
+       
+       
+       //Not sure how this works as I lifted it from Stackoverflow
+   //https://stackoverflow.com/questions/47549648/uikit-how-to-get-order-with-the-sortable-component
+    // but it loops in some way making it possible to retrieve the changed
+    // order of the list.
+    // I am using each run through the loop to find the current item, its 
+    // index number and its content.
+    // Everything id triggered when an item in the list is moved.
+    
+    
+       let sortable = UIkit.sortable("#sortable-element");
+UIkit.util.on(sortable.$el, "added moved", function(e, sortable) { 
+    sortable.items.forEach(function(item, index) { 
+
+      
+      var ThisIndxNo = UIkit.util.data(item, "id")
+      var ThisItem = document.getElementById(ThisIndxNo)
+      var ThisItemContent = ThisItem.textContent
+      
+      //This IF ELSE construct checks to see if we are dealing with the first  
+      //item in the newly reorderd list.
+      // 1. If we are, it just adds the item content to the output string and
+      // updates the previousIndex variable. The horizontal rule of zero pixels
+      // was added for final formatting reasons. There may be a better way!
+      // 2. If not first item in list then if the index number is one more
+      // than the previous index number then the item correctly follows the
+      // previous one and and a green horizontal rule is added and then the
+      // item content added.
+      // 3. If neither of the above then the item doesn't correctly follow the
+      // previous one and a red rule is added, etc.
+
+
+      if (PrevIndxNo == "0") {
+      
+        PrevIndxNo = ThisIndxNo;
+        OutputStr1 = ThisItemContent;
+        OutputStr1 += '\n';
+        OutputStr1 += "<hr style=\"border: 0px solid grey;\">";
+        OutputStr1 += '\n';
+        
+      } else if (ThisIndxNo-PrevIndxNo==1 ){
+        PrevIndxNo = ThisIndxNo;
+        OutputStr1 += '\n';
+        OutputStr1 += "<hr style=\"border: 2px solid lightgreen;\">";
+        OutputStr1 += '\n';
+        OutputStr1 += ThisItemContent;
+
+      } else {
+        PrevIndxNo = ThisIndxNo;
+        OutputStr1 += '\n';
+        OutputStr1 += "<hr style=\"border: 2px solid red;\">";
+        OutputStr1 += '\n';
+        OutputStr1 += ThisItemContent;
+}
+
+    });
+    
+         // The looping has finished so we reset the two variables to their
+         // starting positions ready for the next change made to the list.
+    
+       PrevIndxNo = "0";
+       OutputStr2=OutputStr1;
+       OutputStr1 ="";
+
+         // the changed list with the added coloured rules is placed into
+         // answer paragraph.
+         // Whether this is visible depends on how high up the page it is
+         // displayed. No doubt there is a better way perhaps by changing the 
+         // visibility option on the relevant div.
+         
+       document.getElementById("update").innerHTML = OutputStr2;
+
+    
+});
+
+
+  </script> 
+  </body>
+
+</html>
