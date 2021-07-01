@@ -72,7 +72,7 @@ hr.RED {
   margin-bottom:10px;
   margin-right: 100%;
 }
-div.blank {
+div.feedbackchoice {
   margin: 15px 0;
   width :50%;
   min-width: 400px;
@@ -81,6 +81,15 @@ div.blank {
   padding: 10px;
   background-color: white;
   font-size: 12px;
+  display: none;
+}
+div.TryAgainScore {
+  margin: 0px 0;
+  width :50%;
+  min-width: 400px;
+  border-radius: 0px;
+  padding: 0px;
+  background-color: white;
 }
 div.plain {
   margin: 15px 0;
@@ -117,12 +126,104 @@ div.green {
 <body>
 <a id="topofpage"> </a>
 
-<div><div class="blank">
+<!-- We are writing the feedback options to the screen before the script as the script is used to switch the diplay style. This seems to avoid some problems with the screen appearing to jump or being incorrectly scrolled if the script executed later. -->
+
+<div><div class="feedbackchoice" id="fbc">
 For feedback:<BR>
 <input type="radio" name="Feedback" value=0 id="UseSequential" onclick="updateFeedbackChoice()" checked="checked">Use sequential accuracy 
 <input type="radio" name="Feedback" value=1 id="UsePositional" onclick="updateFeedbackChoice()" >Use positional accuracy   
 </div></div>
-  
+ 
+<script>
+       
+       //Initialise some variables
+       var buttonMessage ="Try Again";
+       var OutputStr1 ="";
+       var OutputStr1A ="";
+       var OutputStr2 ="";
+       var OutputStr2A ="";
+       var PrevIndxNo = "0";
+       var PrevIndxNo2 = 0;
+       var NumOfItems = 0;
+       var checkboxvalue = 0;
+       var NumOfItems = 0;
+       var scoreSA = 0;
+       var scorePA = 0;
+       var scSA = "";       //scoreSA as a string as a string
+       var scPA = "";       //scorePA as a string as a string
+       var noi = "";        //number of items as a string
+       
+       var OutputScoreSA ="";
+       var OutputScorePA ="";
+       
+       //**********************************************************
+       //The following variables enable options to be selected. 0=No, 1=yes.
+       
+       //FirstLineFeedback determines whether a horizontal rule is put above
+       //the first item in the feedback.
+       
+       //BoxedFeedback determines whether the items in the feedback are boxed
+       //in the same way as in the task. This is optional when the assessment
+       //is based on sequential accuracy. When assessment is based on positional
+       //accuracy feedback is always in appropriately coloured boxes.
+       
+       var FirstLineFeedback = 1; //only applies to sequential accuracy
+       var BoxedFeedback = 1;     //only applies to sequential accuracy
+       var AssessPositionalAccuracy = 0;
+       var DisplayFeedbackOptions = 1;
+       var DisplayScore = 1;
+       
+       //**********************************************************
+
+if (DisplayFeedbackOptions == 1){
+
+document.getElementById("fbc").style.display = "block";
+    
+//The following is used if user has been given the option to decide
+//on type of feedback.
+//The first few lines set the initial value based on
+//the initial value set in the radio buttons. The function updates the
+//value whenever a radio button is clicked.
+
+      
+var checked = document.querySelector('input[name = "Feedback"]:checked');
+if (checked.value == 1){
+AssessPositionalAccuracy = 1;
+} else {AssessPositionalAccuracy = 0};
+
+// This function is called when the radio button is changed.
+// The function checks to see if the relevant string is empty, for if it is
+// we don't want to write over the initial instruction that the task must be
+// attempted before checking. If it isn't empty then the appropriate string is
+// written into update element of the web page and, also the appropriate
+// score is written out if DisplayScore has been selected.
+
+function updateFeedbackChoice(){
+var checked = document.querySelector('input[name = "Feedback"]:checked');
+if (checked.value == 1){
+AssessPositionalAccuracy = 1;
+if (OutputStr2A != ""){
+document.getElementById("update").innerHTML = OutputStr2A;
+if (DisplayScore == 1){document.getElementById("score").innerHTML = OutputScorePA;};
+}
+
+} else {
+
+AssessPositionalAccuracy = 0
+if (OutputStr1A != ""){
+document.getElementById("update").innerHTML = OutputStr1A;
+if (DisplayScore == 1){document.getElementById("score").innerHTML = OutputScoreSA;};
+}
+};
+}; //end of function
+
+} else {
+
+document.getElementById("fbc").style.display = "none";
+      
+} // end of If (DisplayFeedbackOptions == 1) 
+</script>
+
     
 <div> <p style="color:blue">Sort the following items into the correct order.</P><P></P> </div>
 <!-- Here are the items in the list. They are written here unsorted
@@ -133,9 +234,13 @@ but the two id numbers define the correct order -->
 
 
 
-<ul id="sortable-element" class="uk-nav uk-nav-default uk-width-big" uk-sortable="cls-custom: uk-box-shadow-small uk-flex uk-flex-middle uk-background"
-       >
+<ul id="sortable-element" class="uk-nav uk-nav-default uk-width-big" uk-sortable="cls-custom: uk-box-shadow-small uk-flex uk-flex-middle uk-background">
 
+<!-- ******************************************************** -->
+<!-- ******************************************************** -->
+<!-- ******************start of list items******************* -->
+<!-- ******************************************************** -->
+<!-- ******************************************************** -->
   <li class="uk-sortable-item" data-id="3" id="3">                          To die—to sleep,<BR>
 No more; and by a sleep to say we end<BR>
 The heart-ache and the thousand natural shocks<BR>
@@ -187,6 +292,11 @@ And lose the name of action.
   <li class="uk-sortable-item" data-id="12" id="12">Thus conscience doth make cowards of us all,
   </li>
   
+<!-- ******************************************************** -->
+<!-- ******************************************************** -->
+<!-- ********************end of list items******************* -->
+<!-- ******************************************************** -->
+<!-- ******************************************************** -->
 </ul>
 
 </div>    
@@ -204,81 +314,35 @@ And lose the name of action.
 <P> You need to attempt the task before checking the answer </P>
 </div>
 
+
 <p style="margin-bottom:3cm;"></p>
 
+<div>
+<div style="display: flex; flex-direction: row; " class="TryAgainScore">
+   <div style="width: 200px;" >
+   <a href="#topofpage">
+   <button class="button button2" id="myButton" >Try again</button>
+   </a></div>
 
-<div><a href="#topofpage"><button class="button button2" >Try again</button></a></div>
+   <div style="color:blue;" id = score></div>
+</div></div>
+
 <p style="margin-bottom:1cm;"></p>
 
-       
-       <script>
-       
-       //Initialise some variables
-       var OutputStr1 ="";
-       var OutputStrA ="";
-       var OutputStr2 ="";
-       var OutputStr2A ="";
-       var PrevIndxNo = "0";
-       var PrevIndxNo2 = 0;
-       var checkboxvalue = 0;
-       
-       //**********************************************************
-       //The following variables enable options to be selected. 0=No, 1=yes.
-       
-       //FirstLineFeedback determines whether a horizontal rule is put above
-       //the first item in the feedback.
-       
-       //BoxedFeedback determines whether the items in the feedback are boxed
-       //in the same way as in the task. This is optional when the assessment
-       //is based on sequential accuracy. When assessment is based on positional
-       //accuracy feedback is always in appropriately coloured boxes.
-       
-       var FirstLineFeedback = 1;
-       var BoxedFeedback = 1;
-       var AssessPositionalAccuracy = 0;
-       
-       //Use the following if user has been given the checkboxes to decide
-       //on type of feedback. The first few lines set the initial value based on
-       //the initial value set in the radio buttons. The function updates the
-       //value whenever a radio button is clicked.
-       // ***** If the option to choose has been deleted from the page then
-       // these lines must also be deleted or commented out. **********
-       
-var checked = document.querySelector('input[name = "Feedback"]:checked');
-if (checked.value == 1){
-AssessPositionalAccuracy = 1;
-} else {AssessPositionalAccuracy = 0};
+    
 
-// This function is called when the radio button is changed.
-// The function checks to see if the relevant string is empty, for if it is
-// we don't want to write over the initial instruction that the task must be
-// attempted before checking. If it isn't empty then the appropriate string is
-// written into update element of the web page.
+    
+<script>
 
-function updateFeedbackChoice(){
-var checked = document.querySelector('input[name = "Feedback"]:checked');
-if (checked.value == 1){
-AssessPositionalAccuracy = 1;
-if (OutputStr2A != ""){
-document.getElementById("update").innerHTML = OutputStr2A;}
-} else {
-AssessPositionalAccuracy = 0
-if (OutputStr1A != ""){
-document.getElementById("update").innerHTML = OutputStr1A;}
-};
-
-} //end of function
-      
-       
-       //Not sure how this works as I lifted it from Stackoverflow
+//Not sure how these 3 lines work as I lifted them from Stackoverflow
    //https://stackoverflow.com/questions/47549648/uikit-how-to-get-order-with-the-sortable-component
-    // but it loops in some way making it possible to retrieve the changed
-    // order of the list.
-    // I am using each run through the loop to find the current item, its 
-    // index number and its content.
-    // Everything id triggered when an item in the list is moved.
-    
-    
+// but it loops in some way making it possible to retrieve the changed
+// order of the list.
+
+// I am using each run through the loop to find the current item, its 
+// index number and its content.
+// It is triggered when an item in the list is moved to a new position.
+
     
       let sortable = UIkit.sortable("#sortable-element");
       UIkit.util.on(sortable.$el, "added moved", function(e, sortable) { 
@@ -288,6 +352,8 @@ document.getElementById("update").innerHTML = OutputStr1A;}
       var ThisIndxNo = UIkit.util.data(item, "id")
       var ThisItem = document.getElementById(ThisIndxNo)
       var ThisItemContent = ThisItem.innerHTML
+      
+      NumOfItems = NumOfItems + 1;
       
  // These lines give feedback based on sequential accuracy.
         
@@ -310,6 +376,7 @@ document.getElementById("update").innerHTML = OutputStr1A;}
         
         if (FirstLineFeedback == 1 && ThisIndxNo ==1){
         OutputStr1 += "<BR><hr class=\"green\">";
+        scoreSA = scoreSA + 1;
         }
         if (FirstLineFeedback == 1 && ThisIndxNo !=1){
         OutputStr1 += "<BR><hr class=\"red\">";
@@ -324,6 +391,7 @@ document.getElementById("update").innerHTML = OutputStr1A;}
       } else if (ThisIndxNo-PrevIndxNo==1 ){
         PrevIndxNo = ThisIndxNo;
         OutputStr1 += "<hr class=\"green\">";
+        scoreSA = scoreSA + 1;
         if (BoxedFeedback == 1){OutputStr1 += "<DIV class=\"plain\">";}
         OutputStr1 += ThisItemContent;
         if (BoxedFeedback == 1){OutputStr1 += "</DIV>";}
@@ -336,42 +404,74 @@ document.getElementById("update").innerHTML = OutputStr1A;}
         if (BoxedFeedback == 1){OutputStr1 += "</DIV>";}
       } 
 
-// This lines gives feedback based on positonal accuracy.
+// These lines gives feedback based on positonal accuracy.
+        
         
         PrevIndxNo2 = PrevIndxNo2+1;        
         if (ThisIndxNo == PrevIndxNo2){
         OutputStr2 += "<DIV class=\"green\">";
         OutputStr2 += ThisItemContent;
         OutputStr2 += "</DIV>";
+        scorePA = scorePA + 1;
         } else {
         OutputStr2 += "<DIV class=\"red\">";
         OutputStr2 += ThisItemContent;
         OutputStr2 += "</DIV>";
         }
-
-
+        
     });
     
-         // The looping has finished so we reset the variables to their
-         // starting positions ready for the next change made to the list.
     
-       PrevIndxNo = "0";
-       PrevIndxNo2 = 0;
-       OutputStr1A=OutputStr1;
-       OutputStr2A=OutputStr2;
-       OutputStr1 ="";
-       OutputStr2 ="";
+         // The looping has finished so we can prepare the various outputs
+         // and reset variables to their starting positions ready
+         // for the next change made to the list.
+    
+        buttonMessage ="Try Again";
+        if (NumOfItems==scorePA){buttonMessage="Well done!"};
+        if (FirstLineFeedback == 1 && NumOfItems==scoreSA){buttonMessage="Well done!"};
+        if (FirstLineFeedback == 0 && NumOfItems-1==scoreSA){buttonMessage="Well done!"};
+        document.getElementById("myButton").textContent = buttonMessage;
+    
+    
+        noi = NumOfItems.toString();
+        scSA = scoreSA.toString();
+        scPA = scorePA.toString();
+        if (FirstLineFeedback == 0){
+        OutputScoreSA = "Sequential score: ".concat(scSA).concat(" / ").concat(noi-1);
+        } else {OutputScoreSA = "Sequential score: ".concat(scSA).concat(" / ").concat(noi);}
+        
+        
+        OutputScorePA = "Positional score: ".concat(scPA).concat(" / ").concat(noi);
+        
+        PrevIndxNo = "0";
+        PrevIndxNo2 = 0;
+        NumOfItems = 0;
+        scoreSA = 0;
+        scorePA = 0;
+        OutputStr1A=OutputStr1;
+        OutputStr2A=OutputStr2;
+        OutputStr1 ="";
+        OutputStr2 ="";
        
-//console.log(OutputStr1A);
 
          // the changed list with the added coloured rules or coloured 
-         // boxes are placed into the answer paragraph. Which depends
+         // boxes are placed into the 'update' paragraph. Which depends
          // on what type of feedback has been selected.
+         // The appropriate scores are written to the 'score' paragraph.
          
+    if (DisplayScore == 1){
+       if (AssessPositionalAccuracy == 0){  
+       document.getElementById("update").innerHTML = OutputStr1A;
+       document.getElementById("score").innerHTML = OutputScoreSA;
+       } else {
+       document.getElementById("update").innerHTML = OutputStr2A;
+       document.getElementById("score").innerHTML = OutputScorePA; }
+    } else {
        if (AssessPositionalAccuracy == 0){  
        document.getElementById("update").innerHTML = OutputStr1A;
        } else {
-       document.getElementById("update").innerHTML = OutputStr2A; }
+       document.getElementById("update").innerHTML = OutputStr2A;}
+    }
 
     
 });
